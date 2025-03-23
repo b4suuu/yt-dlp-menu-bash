@@ -1,0 +1,58 @@
+#!/bin/bash
+
+# Funkcja pobierania filmów
+download_video() {
+    if [ ! -f url.txt ]; then
+        echo "Plik url.txt nie istnieje! Dodaj linki do playlisty lub utworów i spróbuj ponownie."
+        exit 1
+    fi
+
+    while IFS= read -r URL; do
+        echo "Pobieranie: $URL"
+        yt-dlp -f "bestvideo[height<=1080]+bestaudio/best[height<=1080]" --merge-output-format mp4 -o "%(playlist)s/%(title)s.%(ext)s" "$URL"
+    done < url.txt
+
+    echo "✅ Pobieranie zakończone!"
+}
+
+# Funkcja pobierania muzyki
+download_audio() {
+    if [ ! -f url.txt ]; then
+        echo "Plik url.txt nie istnieje! Dodaj linki do playlisty lub utworów i spróbuj ponownie."
+        exit 1
+    fi
+
+    while IFS= read -r URL; do
+        echo "Pobieranie: $URL"
+        yt-dlp -f "bestaudio" --extract-audio --audio-format mp3 --audio-quality 0 -o "%(playlist)s/%(title)s.%(ext)s" "$URL"
+    done < url.txt
+
+    echo "✅ Pobieranie zakończone!"
+}
+
+# Menu wyboru
+clear
+echo "WYBIERZ OPCJE:"
+echo ""
+echo "1. Pobierz film"
+echo "2. Pobierz muzykę"
+echo "3. Wyjście"
+echo ""
+read -p "WYBIERZ OPCJE: " choice
+
+case $choice in
+    1)
+        download_video
+        ;;
+    2)
+        download_audio
+        ;;
+    3)
+        echo "Wyjście..."
+        exit 0
+        ;;
+    *)
+        echo "Nieprawidłowy wybór!"
+        exit 1
+        ;;
+esac
